@@ -1,18 +1,24 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
+  <PropertyGroup>
     <_FBSDKLoginKitId>FBSDKLoginKit</_FBSDKLoginKitId>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<ItemGroup Condition="('$(OutputType)' != 'Library' OR '$(IsAppExtension)' == 'True') AND ('$(TargetFrameworks)' == '' AND '$(TargetFramework)' == '')">
-    <_NativeReference Include="$(MSBuildThisFileDirectory)..\lib\xamarinios10\Facebook.LoginKit.resources\FBSDKLoginKit.xcframework">
-      <_Id>$(_FBSDKLoginKitId)</_Id>
-    </_NativeReference>
-  </ItemGroup>
-  
-  <Target Name="_ResolveNativeReferencesForFacebookLoginKit" 
-          BeforeTargets="ResolveNativeReferences"
-          Condition="('$(TargetFrameworks)' == '' AND '$(TargetFramework)' == '') OR '$(IsBindingProject)' == 'true'">
+  <Target Name="_FBSDKLoginKitResolveNativeReferences" BeforeTargets="ResolveNativeReferences" Condition="('$(TargetFrameworks)' == '' And '$(TargetFramework)' == '') Or '$(IsBindingProject)' == 'true'">
+    <PropertyGroup>
+      <_FBSDKLoginKitXCFArch Condition="'$(_PlatformName)' == 'iOS' And '$(_SdkIsSimulator)' == 'False'">ios-arm64_armv7</_FBSDKLoginKitXCFArch>
+      <_FBSDKLoginKitXCFArch Condition="'$(_PlatformName)' == 'iOS' And '$(_SdkIsSimulator)' == 'True'">ios-arm64_i386_x86_64-simulator</_FBSDKLoginKitXCFArch>
+      <_FBSDKLoginKitXCFArch Condition="'$(_PlatformName)' == 'tvOS' And '$(_SdkIsSimulator)' == 'False'">tvos-arm64</_FBSDKLoginKitXCFArch>
+      <_FBSDKLoginKitXCFArch Condition="'$(_PlatformName)' == 'tvOS' And '$(_SdkIsSimulator)' == 'True'">tvos-arm64_x86_64-simulator</_FBSDKLoginKitXCFArch>
+      <_FBSDKLoginKitXCFArch Condition="'$(_PlatformName)' == 'MacCatalyst'">ios-arm64_x86_64-maccatalyst</_FBSDKLoginKitXCFArch>
+    </PropertyGroup>
+
+    <ItemGroup Condition="('$(OutputType)' != 'Library' OR '$(IsAppExtension)' == 'True')">
+      <_NativeReference Include="$(DeviceSpecificIntermediateOutputPath)mtouch-cache\Facebook.LoginKit.resources\FBSDKLoginKit.xcframework\$(_FBSDKLoginKitXCFArch)\FBSDKLoginKit.framework">
+        <_Id>$(_FBSDKLoginKitId)</_Id>
+      </_NativeReference>
+    </ItemGroup>
+
     <ItemGroup>
       <_NativeReference Update="@(_NativeReference)" Condition="'%(_NativeReference._Id)' == '$(_FBSDKLoginKitId)'">
         <Kind>Framework</Kind>
@@ -22,5 +28,12 @@
       </_NativeReference>
       <NativeReference Include="@(_NativeReference)" />
     </ItemGroup>
+
+    <Ditto
+      SessionId="$(BuildSessionId)"
+      Condition="'$(IsMacEnabled)' == 'true' And ('$(OutputType)' != 'Library' Or '$(IsAppExtension)' == 'True')"
+      Source="$(MSBuildThisFileDirectory)..\lib\xamarinios10\Facebook.LoginKit.resources.zip"
+      Destination="$(DeviceSpecificOutputPath)Facebook.LoginKit.resources.zip"
+    />
   </Target>
 </Project>

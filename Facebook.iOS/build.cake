@@ -155,7 +155,7 @@ Task ("libs")
 	DotNetCoreBuild(SOLUTION_PATH, dotNetCoreBuildSettings);
 });
 
-Task ("samples")
+/*Task ("samples")
 	.IsDependentOn("libs")
 	.Does(() =>
 {
@@ -172,7 +172,7 @@ Task ("samples")
 		msBuildSettings.Targets.Add($@"samples-using-source\{target}");
 	
 	DotNetCoreBuild(SOLUTION_PATH, dotNetCoreBuildSettings);
-});
+});*/
 
 Task ("nuget")
 	.IsDependentOn("libs")
@@ -221,7 +221,7 @@ Task ("ci")
 	.IsDependentOn("externals")
 	.IsDependentOn("libs")
 	.IsDependentOn("nuget")
-	.IsDependentOn("samples");
+	/*.IsDependentOn("samples")*/;
 
 Teardown (context =>
 {

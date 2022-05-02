@@ -1,18 +1,24 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<PropertyGroup>
+  <PropertyGroup>
     <_FBSDKShareKitId>FBSDKShareKit</_FBSDKShareKitId>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<ItemGroup Condition="('$(OutputType)' != 'Library' OR '$(IsAppExtension)' == 'True') AND ('$(TargetFrameworks)' == '' AND '$(TargetFramework)' == '')">
-    <_NativeReference Include="$(MSBuildThisFileDirectory)..\lib\xamarinios10\Facebook.ShareKit.resources\FBSDKShareKit.xcframework">
-      <_Id>$(_FBSDKShareKitId)</_Id>
-    </_NativeReference>
-  </ItemGroup>
-  
-  <Target Name="_ResolveNativeReferencesForFacebookShareKit" 
-          BeforeTargets="ResolveNativeReferences"
-          Condition="('$(TargetFrameworks)' == '' AND '$(TargetFramework)' == '') OR '$(IsBindingProject)' == 'true'">
+  <Target Name="_FBSDKShareKitResolveNativeReferences" BeforeTargets="ResolveNativeReferences" Condition="('$(TargetFrameworks)' == '' And '$(TargetFramework)' == '') Or '$(IsBindingProject)' == 'true'">
+    <PropertyGroup>
+      <_FBSDKShareKitXCFArch Condition="'$(_PlatformName)' == 'iOS' And '$(_SdkIsSimulator)' == 'False'">ios-arm64_armv7</_FBSDKShareKitXCFArch>
+      <_FBSDKShareKitXCFArch Condition="'$(_PlatformName)' == 'iOS' And '$(_SdkIsSimulator)' == 'True'">ios-arm64_i386_x86_64-simulator</_FBSDKShareKitXCFArch>
+      <_FBSDKShareKitXCFArch Condition="'$(_PlatformName)' == 'tvOS' And '$(_SdkIsSimulator)' == 'False'">tvos-arm64</_FBSDKShareKitXCFArch>
+      <_FBSDKShareKitXCFArch Condition="'$(_PlatformName)' == 'tvOS' And '$(_SdkIsSimulator)' == 'True'">tvos-arm64_x86_64-simulator</_FBSDKShareKitXCFArch>
+      <_FBSDKShareKitXCFArch Condition="'$(_PlatformName)' == 'MacCatalyst'">ios-arm64_x86_64-maccatalyst</_FBSDKShareKitXCFArch>
+    </PropertyGroup>
+
+    <ItemGroup Condition="('$(OutputType)' != 'Library' OR '$(IsAppExtension)' == 'True')">
+      <_NativeReference Include="$(DeviceSpecificIntermediateOutputPath)mtouch-cache\Facebook.ShareKit.resources\FBSDKShareKit.xcframework\$(_FBSDKShareKitXCFArch)\FBSDKShareKit.framework">
+        <_Id>$(_FBSDKShareKitId)</_Id>
+      </_NativeReference>
+    </ItemGroup>
+
     <ItemGroup>
       <_NativeReference Update="@(_NativeReference)" Condition="'%(_NativeReference._Id)' == '$(_FBSDKShareKitId)'">
         <Kind>Framework</Kind>
@@ -22,5 +28,12 @@
       </_NativeReference>
       <NativeReference Include="@(_NativeReference)" />
     </ItemGroup>
+
+    <Ditto
+      SessionId="$(BuildSessionId)"
+      Condition="'$(IsMacEnabled)' == 'true' And ('$(OutputType)' != 'Library' Or '$(IsAppExtension)' == 'True')"
+      Source="$(MSBuildThisFileDirectory)..\lib\xamarinios10\Facebook.ShareKit.resources.zip"
+      Destination="$(DeviceSpecificOutputPath)Facebook.ShareKit.resources.zip"
+    />
   </Target>
 </Project>
